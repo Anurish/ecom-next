@@ -132,7 +132,7 @@ const fetchSuggestions = async (value) => {
 
   const fetchCryptoCoins = async () => {
     try {
-      const url = `https://test2.ezdash.online/api/v1/payment/stripe-publish-key?country=${country}&type=crypto`;
+      const url = `https://prod2api.ezdash.online/api/v1/payment/stripe-publish-key?country=${country}&type=crypto`;
       const res = await fetch(url);
       const data = await res.json();
       const coins = (data?.data?.bitcoin_list || []).map((c) => c.code);
