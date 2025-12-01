@@ -247,7 +247,7 @@ const copyAddress = () => {
         {/* Steps */}
         <div className="flex flex-col md:flex-row items-center justify-between mt-16 px-4 gap-6">
           {[
-            { label: "Warten auf Anzahlung", icon: "/steps/save-money.svg", active: status !== "waiting" ? false : true },
+            { label: "Warten auf Anzahlung", icon: "/steps/Save-money.svg", active: status !== "waiting" ? false : true },
             { label: "Warten auf Bestätigungen", icon: "/steps/Waiting.svg", active: status === "confirming" || status === "finished" },
             { label: "Erhalten", icon: "/steps/Verified.svg", active: status === "finished" },
             { label: "Ihre Bestellung wird in Kürze verpackt", icon: "/steps/fi_17768781.svg", active: status === "finished" }
