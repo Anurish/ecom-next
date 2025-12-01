@@ -70,7 +70,7 @@ export default function CheckoutPage() {
 
     const fetchShipping = async () => {
       try {
-        const url = `https://test2.ezdash.online/api/v1/payment/stripe-publish-key?country=${country}&type=crypto`;
+        const url = `https://prod2api.ezdash.online/api/v1/payment/stripe-publish-key?country=${country}&type=crypto`;
         const res = await fetch(url);
         const data = await res.json();
         const cost = data?.data?.shipping_cost?.cost || 0;
