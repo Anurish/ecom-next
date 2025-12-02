@@ -60,29 +60,29 @@ export default function CartPage() {
                         </p>
                       )}
 
-                      {/* QUANTITY */}
-                      <div className="flex items-center gap-3 mt-4">
-                        <button
-                          className="px-3 py-1 bg-gray-200 rounded-lg"
-                          onClick={() =>
-                            item.paidQty > 1 &&
-                            updateQuantity(item.key, item.paidQty - 1)
-                          }
-                        >
-                          -
-                        </button>
+                  {/* QUANTITY */}
+<div className="flex items-center gap-3 mt-4">
+  <button
+    className="px-3 py-1 bg-gray-200 rounded-lg"
+    onClick={() =>
+      item.paidQty > 1 && updateQuantity(item.key, item.paidQty - 1)
+    }
+  >
+    -
+  </button>
 
-                        <span className="px-3 font-semibold">{visibleQty}</span>
+  <span className="px-3 font-semibold">{visibleQty}</span>
 
-                        <button
-                          className="px-3 py-1 bg-gray-200 rounded-lg"
-                          onClick={() =>
-                            updateQuantity(item.key, item.paidQty + 1)
-                          }
-                        >
-                          +
-                        </button>
-                      </div>
+  <button
+    className="px-3 py-1 bg-gray-200 rounded-lg"
+    onClick={() =>
+      updateQuantity(item.key, item.paidQty + 1)
+    }
+  >
+    +
+  </button>
+</div>
+
                     </div>
 
                     {/* REMOVE */}
