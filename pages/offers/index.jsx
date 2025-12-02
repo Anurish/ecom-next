@@ -16,7 +16,7 @@ export default function Offers() {
   "https://test2.ezdash.online/api/v1/product/available/list?limit=500&searchKey=&country=Netherlands&category=",
   {
     headers: {
-      Authorization: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ5YTE4YTcwOWI1MzM3MDA2ZThlODQiLCJlbWFpbCI6InN1cGVyYWRtaW5AeW9wbWFpbC5jb20iLCJmdWxsbmFtZSI6IlN1cGVyIEFkbWluIiwicm9sZSI6IlN1cGVyQWRtaW4iLCJpYXQiOjE3NjQyMzIyMzYsImV4cCI6MTc2NDMxODYzNn0.B3OC_b6OIwzl0lUaAptFlcp1KC7kbdeC96hv7FjyMH8`,
+      Authorization: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ5YTE4YTcwOWI1MzM3MDA2ZThlODQiLCJlbWFpbCI6InN1cGVyYWRtaW5AeW9wbWFpbC5jb20iLCJmdWxsbmFtZSI6IlN1cGVyIEFkbWluIiwicm9sZSI6IlN1cGVyQWRtaW4iLCJpYXQiOjE3NjQ2NTI4NzUsImV4cCI6MTc2NDczOTI3NX0.BLOSGsp6beO1BHYVdDYwxOaRcvgZEHbkjK_O1f_VlH0`,
     
     }
   }
