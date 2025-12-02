@@ -5,49 +5,52 @@ import Footer from "../../components/Footer";
 import { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
 
-export default function ProductDetail({ product }) {
+export default function ProductDetail() {
   const router = useRouter();
+  const { id } = router.query;
+
   const { addToCart } = useCart();
   const [qty, setQty] = useState(1);
 
-  const [related, setRelated] = useState([]);       // now fetched on frontend
-  const [loadingRelated, setLoadingRelated] = useState(true);
+  const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!product) return <div className="py-20 text-center text-xl">Product not found</div>;
-
-  // Fetch RELATED PRODUCTS on client only (after page loads)
+  // Fetch product + related WITHOUT blocking UI
   useEffect(() => {
-    async function fetchRelated() {
-      setLoadingRelated(true);
+    if (!id) return;
+
+    async function fetchData() {
       try {
-        const res = await fetch(
-          "https://test2.ezdash.online/api/v1/product/list/?page=1&limit=200&store=online&stock=all",
-          {
-            headers: {
-              accessToken: process.env.EZ_ACCESS_TOKEN,
-              refreshToken: process.env.EZ_REFRESH_TOKEN,
-            },
-          }
-        );
-
-        const json = await res.json();
-        const list = json?.data?.data || [];
-
-        const productCat = product.category?.name || product.category;
-        const r = list
-          .filter(
-            (p) => (p.category?.name || p.category) === productCat && p._id !== product._id
-          )
-          .slice(0, 4);
-        setRelated(r);
+        const res = await fetch(`/api/product/${id}`);
+        const data = await res.json();
+        if (res.ok) {
+          setProduct(data.product);
+          setRelated(data.related);
+        }
       } catch (err) {
-        console.error("Related load error:", err);
+        console.error("Product fetch failed:", err);
       }
-      setLoadingRelated(false);
+      setLoading(false);
     }
 
-    fetchRelated();
-  }, [product]);
+    fetchData();
+  }, [id]);
+
+  // UI shows instantly while product loads
+  if (loading)
+    return (
+      <div className="text-center py-20 text-xl">
+        Loading product…
+      </div>
+    );
+
+  if (!product)
+    return (
+      <div className="py-20 text-center text-xl">
+        Product not found
+      </div>
+    );
 
   const productImage =
     product.image ||
@@ -75,13 +78,14 @@ export default function ProductDetail({ product }) {
       <Header />
 
       <div className="max-w-5xl mx-auto py-10 px-4">
-        {/* Back */}
-        <button onClick={() => router.back()} className="mb-6 text-blue-600 underline">
+        <button
+          onClick={() => router.back()}
+          className="mb-6 text-blue-600 underline"
+        >
           ← Back
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Product Image */}
           <Image
             src={productImage}
             width={500}
@@ -90,37 +94,40 @@ export default function ProductDetail({ product }) {
             className="rounded-lg object-contain"
           />
 
-          {/* Product Info */}
           <div>
             <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
             <p className="text-xl text-gray-700 mb-4">
               {product.category?.name || product.category}
             </p>
-
             <p className="text-4xl font-bold text-red-500 mb-6">
               €{price.toFixed(2)}
             </p>
-
             <p className="text-gray-700 leading-relaxed">
               {product.description || "No description available."}
             </p>
 
-            {/* Quantity selector */}
+            {/* Quantity */}
             <div className="flex items-center gap-4 mt-6">
               <span className="font-semibold">Quantity:</span>
 
-              <button className="px-3 py-1 bg-gray-200 rounded-lg" onClick={() => qty > 1 && setQty(qty - 1)}>
+              <button
+                className="px-3 py-1 bg-gray-200 rounded-lg"
+                onClick={() => qty > 1 && setQty(qty - 1)}
+              >
                 -
               </button>
 
               <span className="px-3 font-semibold">{qty}</span>
 
-              <button className="px-3 py-1 bg-gray-200 rounded-lg" onClick={() => setQty(qty + 1)}>
+              <button
+                className="px-3 py-1 bg-gray-200 rounded-lg"
+                onClick={() => setQty(qty + 1)}
+              >
                 +
               </button>
             </div>
 
-            {/* Add to Cart Button */}
+            {/* Add to cart */}
             <button
               onClick={() => handleAdd(qty)}
               className="w-full bg-red-500 text-white py-3 rounded-lg mt-6 text-lg font-semibold hover:bg-red-600 transition"
@@ -130,13 +137,11 @@ export default function ProductDetail({ product }) {
           </div>
         </div>
 
-        {/* RELATED PRODUCTS */}
+        {/* Related Products */}
         <div className="mt-14">
           <h2 className="text-2xl font-bold mb-6">Related Products</h2>
 
-          {loadingRelated && <p className="text-gray-500">Loading related products…</p>}
-
-          {!loadingRelated && related.length === 0 && (
+          {related?.length === 0 && (
             <p className="text-gray-500">No related products found</p>
           )}
 
@@ -147,7 +152,9 @@ export default function ProductDetail({ product }) {
                 (item.images?.length ? item.images[0] : null) ||
                 "/placeholder.jpg";
 
-              const rPrice = Number(item.selling_price ?? item.price ?? item.amount ?? 0).toFixed(2);
+              const rPrice = Number(
+                item.selling_price ?? item.price ?? item.amount ?? 0
+              ).toFixed(2);
 
               return (
                 <div
@@ -174,28 +181,4 @@ export default function ProductDetail({ product }) {
       <Footer />
     </>
   );
-}
-
-/* SERVER SIDE fetch — FAST page load */
-export async function getServerSideProps({ params }) {
-  const EZ_API =
-    "https://test2.ezdash.online/api/v1/product/list/?page=1&limit=200&store=online&stock=all";
-
-  const res = await fetch(EZ_API, {
-    headers: {
-      accessToken: process.env.EZ_ACCESS_TOKEN,
-      refreshToken: process.env.EZ_REFRESH_TOKEN,
-    },
-  });
-
-  const json = await res.json();
-  const list = json?.data?.data || [];
-
-  const product = list.find((p) => p._id === params.id) || null;
-
-  return {
-    props: {
-      product,
-    },
-  };
 }
