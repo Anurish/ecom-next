@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   try {
     const apiUrl =
-      "https://test2.ezdash.online/api/v1/product/list/?page=1&limit=50&store=online&stock=all";
+      "https://test2.ezdash.online/api/v1/product/list/?page=1&limit=5&store=online&stock=all";
 
     const response = await fetch(apiUrl, {
       method: "GET",
