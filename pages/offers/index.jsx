@@ -120,25 +120,20 @@ export default function Offers() {
 
                 <button
 onClick={() => {
-  let qtyToAdd = 1;
-
   const buy = item?.offerData?.combination?.buy;
   const get = item?.offerData?.combination?.get;
 
-  // If offer exists
-  if (buy && get) {
-    const currentQty = Number(item.quantity || 0); // already in cart if present
-    const newQty = currentQty + 1;
+  let paidQty = 1;
+  let freeQty = 0;
 
-    // If user just reached offer threshold
-    if (newQty % buy === 0) {
-      qtyToAdd = 1 + get; // 1 paid + free units
-    }
+  if (buy && get) {
+    freeQty = Math.floor(paidQty / buy) * get;
   }
 
   addToCart({
     ...item,
-    quantity: qtyToAdd,
+    paidQty,
+    freeQty,
     key: item.sku || item._id || item.slug || item.productId,
     offerData: item.offerData || null
   });
