@@ -119,14 +119,20 @@ export default function Offers() {
                 </div>
 
                 <button
-  onClick={() =>
-    addToCart({
-      ...item,
-      quantity: 1,
-      key: item.sku || item._id || item.slug || item.productId,
-      offerData: item.offerData || null
-    })
-  }
+onClick={() => {
+  const isOffer = item?.offerData?.combination?.buy && item?.offerData?.combination?.get;
+  const totalUnits = isOffer
+    ? Number(item.offerData.combination.buy) + Number(item.offerData.combination.get)
+    : 1;
+
+  addToCart({
+    ...item,
+    quantity: totalUnits,
+    key: item.sku || item._id || item.slug || item.productId,
+    offerData: item.offerData || null
+  });
+}}
+
   className="mt-auto w-full bg-red-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
 
 >
