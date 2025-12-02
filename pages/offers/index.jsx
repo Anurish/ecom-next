@@ -120,18 +120,30 @@ export default function Offers() {
 
                 <button
 onClick={() => {
-  const isOffer = item?.offerData?.combination?.buy && item?.offerData?.combination?.get;
-  const totalUnits = isOffer
-    ? Number(item.offerData.combination.buy) + Number(item.offerData.combination.get)
-    : 1;
+  let qtyToAdd = 1;
+
+  const buy = item?.offerData?.combination?.buy;
+  const get = item?.offerData?.combination?.get;
+
+  // If offer exists
+  if (buy && get) {
+    const currentQty = Number(item.quantity || 0); // already in cart if present
+    const newQty = currentQty + 1;
+
+    // If user just reached offer threshold
+    if (newQty % buy === 0) {
+      qtyToAdd = 1 + get; // 1 paid + free units
+    }
+  }
 
   addToCart({
     ...item,
-    quantity: totalUnits,
+    quantity: qtyToAdd,
     key: item.sku || item._id || item.slug || item.productId,
     offerData: item.offerData || null
   });
 }}
+
 
   className="mt-auto w-full bg-red-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
 
