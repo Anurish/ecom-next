@@ -79,14 +79,14 @@ export function CartProvider({ children }) {
   // -------------------------------
   // ADD TO CART
   // -------------------------------
+// ADD TO CART
 const addToCart = (product) => {
   setCart((prev) => {
     const key = product.sku || product._id || product.slug;
     const exist = prev.find((item) => item.key === key);
 
-    const addQty = product.quantity || 1;
+    const addQty = 1; // Always increment paid quantity by 1
 
-    // First add => create paidQty & freeQty
     if (!exist) {
       const paidQty = addQty;
       let freeQty = 0;
@@ -99,7 +99,6 @@ const addToCart = (product) => {
       return [...prev, { ...product, key, paidQty, freeQty }];
     }
 
-    // Already in cart => update
     const updated = prev.map((item) => {
       if (item.key !== key) return item;
 
@@ -117,6 +116,7 @@ const addToCart = (product) => {
     return updated;
   });
 };
+
 
 
 
