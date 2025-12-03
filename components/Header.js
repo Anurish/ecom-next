@@ -20,7 +20,7 @@ const cartCount = cart.reduce(
           <Link href="#">Track your order</Link>
           <Link href="#">Delivery and shipping</Link>
           <Link href="/helpdesk">Helpdesk</Link>
-          <Link href="#">Payments</Link>
+          <Link href="/payments">Payments</Link>
         </div>
       </div>
 
