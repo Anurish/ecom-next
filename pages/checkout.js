@@ -567,19 +567,7 @@ if (data?.success) {
         </>
       )}
 
-         {loading && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-[9999]">
-    <div className="bg-white p-8 rounded-2xl shadow-xl w-[90%] max-w-md text-center animate-fade-in">
-      <div className="flex justify-center mb-6">
-        <div className="w-14 h-14 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-      <h2 className="text-2xl font-semibold text-gray-800">Processing your payment…</h2>
-      <p className="mt-3 text-gray-600 text-sm">
-        Do not refresh or close this window. This may take a few seconds.
-      </p>
-    </div>
-  </div>
-)}
+      
       <Footer />
     </>
   );
