@@ -60,7 +60,7 @@ export default function AboutUs() {
               </div>
               {/* Replace this with your exact arrow image */}
               <img
-                src="/assets/vision-arrow.png"
+                src="/banner/Arrows.png"
                 alt="Vision"
                 className="w-32 sm:w-40 object-contain"
               />
