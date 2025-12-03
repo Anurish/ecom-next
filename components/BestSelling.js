@@ -4,13 +4,13 @@ import ProductCard from "./ProductCard";
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
 export default function BestSelling() {
-  const { data, error } = useSWR("/api/ezdash/products?limit=4", fetcher);
+  const { data, error } = useSWR("/api/local-best-selling", fetcher);
 
   if (error) return <div>Failed to load products</div>;
   if (!data) return <div>Loading best-selling medicines...</div>;
 
-  // Correct path for EZDash API
-  const products = data?.data?.data?.slice(0, 4) || [];
+  const products = (data?.products || []).slice(0, 4);
+
 
   return (
     <section className="mt-10">
