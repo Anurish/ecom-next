@@ -4,6 +4,9 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext";
+import fs from "fs";
+import path from "path";
+
 
 export default function ProductDetail({ product, related }) {
   const router = useRouter();
@@ -156,38 +159,51 @@ addToCart(cartItem);
 }
 
 export async function getServerSideProps({ params }) {
-  const EZ_API =
-    "https://test2.ezdash.online/api/v1/product/list/?page=1&limit=200&store=online&stock=all";
+  const jsonPath = path.join(process.cwd(), "data", "products.json");
 
-  const res = await fetch(EZ_API, {
-    headers: {
-      accessToken: process.env.EZ_ACCESS_TOKEN,
-      refreshToken: process.env.EZ_REFRESH_TOKEN,
-    },
-  });
+  let list = [];
 
-  const json = await res.json();
-  const list = json?.data?.data || [];
+  // Try reading local file
+  try {
+    const file = fs.readFileSync(jsonPath, "utf8");
+    list = JSON.parse(file);
+  } catch (err) {
+    list = [];
+  }
+
+  // If local file empty → fetch once and save
+  if (!list.length) {
+    const res = await fetch(
+      "https://test2.ezdash.online/api/v1/product/list/?page=1&limit=200&store=online&stock=all",
+      {
+        headers: {
+          accessToken: process.env.EZ_ACCESS_TOKEN,
+          refreshToken: process.env.EZ_REFRESH_TOKEN,
+        },
+      }
+    );
+
+    const json = await res.json();
+    list = json?.data?.data || [];
+
+    // Write file to disk so next request becomes super fast
+    fs.writeFileSync(jsonPath, JSON.stringify(list), "utf8");
+  }
 
   const product = list.find((p) => p._id === params.id) || null;
 
-  // RELATED
   const related =
     product && product.category
       ? list
           .filter((p) => {
             const cat = p.category?.name || p.category;
             const productCat = product.category?.name || product.category;
-
             return cat === productCat && p._id !== product._id;
           })
           .slice(0, 4)
       : [];
 
   return {
-    props: {
-      product,
-      related,
-    },
+    props: { product, related },
   };
-}      
+}
