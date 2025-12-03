@@ -23,10 +23,11 @@ export default function CategoryPage({ page, rawCategorySlug }) {
     CATEGORY_MAP[rawCategorySlug.toLowerCase()] || rawCategorySlug;
 
   // Fetch products client-side
-  const { data } = useSWR(
-    `/api/ezdash/category?category=${readableCategory}&page=${page}&limit=12`,
-    fetcher
-  );
+ const { data } = useSWR(
+  `/api/local-category?category=${readableCategory}&page=${page}&limit=12`,
+  fetcher
+);
+
 
   const products =
     Array.isArray(data?.products) && data?.products.length > 0
