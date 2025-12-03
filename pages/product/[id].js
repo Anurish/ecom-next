@@ -162,25 +162,17 @@ export async function getServerSideProps({ params }) {
   const jsonPath = path.join(process.cwd(), "data", "products.json");
 
   let list = [];
-  let lastUpdated = 0;
 
-  // Read JSON if exists
+  // Try reading local file
   try {
     const file = fs.readFileSync(jsonPath, "utf8");
     list = JSON.parse(file);
-
-    // Read file timestamp
-    lastUpdated = fs.statSync(jsonPath).mtimeMs;
   } catch (err) {
     list = [];
   }
 
-  const now = Date.now();
-  const DAY_IN_MS = 24 * 60 * 60 * 1000;
-  const shouldRefresh = !list.length || now - lastUpdated > DAY_IN_MS;
-
-  if (shouldRefresh) {
-    console.log("⟳ Auto-refreshing product JSON (24-hour update)");
+  // If local file empty → fetch once and save
+  if (!list.length) {
     const res = await fetch(
       "https://test2.ezdash.online/api/v1/product/list/?page=1&limit=200&store=online&stock=all",
       {
@@ -194,14 +186,12 @@ export async function getServerSideProps({ params }) {
     const json = await res.json();
     list = json?.data?.data || [];
 
-    // Save updated JSON to disk
+    // Write file to disk so next request becomes super fast
     fs.writeFileSync(jsonPath, JSON.stringify(list), "utf8");
   }
 
-  // Find selected product
   const product = list.find((p) => p._id === params.id) || null;
 
-  // Related products
   const related =
     product && product.category
       ? list
