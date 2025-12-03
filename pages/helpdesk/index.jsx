@@ -38,7 +38,7 @@ export default function HelpDesk() {
 
             {/* RIGHT SIDE IMAGE */}
             <img
-              src="/banner/delivery-bg.png"
+              src="/banner/export.png"
               alt="Truck"
               className="w-72 object-contain"
             />
