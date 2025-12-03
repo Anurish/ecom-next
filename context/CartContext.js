@@ -79,6 +79,7 @@ export function CartProvider({ children }) {
   // -------------------------------
   // ADD TO CART
   // -------------------------------
+// ADD TO CART
 const addToCart = (product) => {
   setCart((prev) => {
     const key = product.sku || product._id || product.slug;
@@ -117,6 +118,7 @@ const addToCart = (product) => {
     return updated;
   });
 };
+
 
 
 

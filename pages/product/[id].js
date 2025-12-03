@@ -190,4 +190,4 @@ export async function getServerSideProps({ params }) {
       related,
     },
   };
-}
+}      

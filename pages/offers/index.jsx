@@ -16,7 +16,7 @@ export default function Offers() {
   "https://test2.ezdash.online/api/v1/product/available/list?limit=500&searchKey=&country=Netherlands&category=",
   {
     headers: {
-      Authorization: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ5YTE4YTcwOWI1MzM3MDA2ZThlODQiLCJlbWFpbCI6InN1cGVyYWRtaW5AeW9wbWFpbC5jb20iLCJmdWxsbmFtZSI6IlN1cGVyIEFkbWluIiwicm9sZSI6IlN1cGVyQWRtaW4iLCJpYXQiOjE3NjQyMzIyMzYsImV4cCI6MTc2NDMxODYzNn0.B3OC_b6OIwzl0lUaAptFlcp1KC7kbdeC96hv7FjyMH8`,
+      Authorization: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ5YTE4YTcwOWI1MzM3MDA2ZThlODQiLCJlbWFpbCI6InN1cGVyYWRtaW5AeW9wbWFpbC5jb20iLCJmdWxsbmFtZSI6IlN1cGVyIEFkbWluIiwicm9sZSI6IlN1cGVyQWRtaW4iLCJpYXQiOjE3NjQ2NTI4NzUsImV4cCI6MTc2NDczOTI3NX0.BLOSGsp6beO1BHYVdDYwxOaRcvgZEHbkjK_O1f_VlH0`,
     
     }
   }
@@ -119,14 +119,27 @@ export default function Offers() {
                 </div>
 
                 <button
-  onClick={() =>
-    addToCart({
-      ...item,
-      quantity: 1,
-      key: item.sku || item._id || item.slug || item.productId,
-      offerData: item.offerData || null
-    })
+onClick={() => {
+  const buy = item?.offerData?.combination?.buy;
+  const get = item?.offerData?.combination?.get;
+
+  let paidQty = 1;
+  let freeQty = 0;
+
+  if (buy && get) {
+    freeQty = Math.floor(paidQty / buy) * get;
   }
+
+  addToCart({
+    ...item,
+    paidQty,
+    freeQty,
+    key: item.sku || item._id || item.slug || item.productId,
+    offerData: item.offerData || null
+  });
+}}
+
+
   className="mt-auto w-full bg-red-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
 
 >
