@@ -19,7 +19,7 @@ const cartCount = cart.reduce(
         <div className="max-w-7xl mx-auto flex justify-end gap-6 px-4">
           <Link href="#">Track your order</Link>
           <Link href="#">Delivery and shipping</Link>
-          <Link href="#">Helpdesk</Link>
+          <Link href="/helpdesk">Helpdesk</Link>
           <Link href="#">Payments</Link>
         </div>
       </div>
