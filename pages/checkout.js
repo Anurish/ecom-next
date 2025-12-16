@@ -259,9 +259,17 @@ if (paymentMethod === "crypto") {
     }));
 
 // normalize phone
-const cleanPhone = phone.replace(/\D/g, "");
-const cleanCode = countryCode.replace(/\D/g, "");
-const whatsappPhone = `${cleanCode}${cleanPhone}`;
+// Clean inputs
+const cleanPhone = phone.replace(/\D/g, "");        // "6656545545"
+const cleanCode = countryCode.replace(/\D/g, "");  // "31"
+
+// For order storage (IMPORTANT)
+const orderPhone = cleanPhone;          // local only
+const orderPhoneCode = `+${cleanCode}`; // "+31"
+
+// For WhatsApp (internal use by gateway)
+const whatsappPhone = `${cleanCode}${cleanPhone}`; // "316656545545"
+
 
 const payload = {
   customer: {
@@ -274,8 +282,10 @@ const payload = {
     house_no: hiddenHouse,
     street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
     zip: postcode,
-    phone_code: cleanCode,        // "31"
-    phone: whatsappPhone,         // "31612345678"
+
+    phone_code: orderPhoneCode, // "+31"
+    phone: orderPhone,          // local number only
+
     country_code: country.slice(0, 2).toUpperCase(),
     country,
     guest_ip: "",
@@ -288,6 +298,7 @@ const payload = {
   order_notes: notes,
   products: fixedCart,
 };
+
 
 
   const res = await fetch(
