@@ -259,16 +259,14 @@ if (paymentMethod === "crypto") {
     }));
 
 // normalize phone
-// Clean inputs
 const cleanPhone = phone.replace(/\D/g, "");        // "6656545545"
 const cleanCode = countryCode.replace(/\D/g, "");  // "31"
 
-// For order storage (IMPORTANT)
-const orderPhone = cleanPhone;          // local only
-const orderPhoneCode = `+${cleanCode}`; // "+31"
+// THIS is what ezdash expects
+const ezdashPhone = `${cleanCode}${cleanPhone}`;   // "316656545545"
 
-// For WhatsApp (internal use by gateway)
-const whatsappPhone = `${cleanCode}${cleanPhone}`; // "316656545545"
+console.log("EZDASH PHONE:", ezdashPhone);
+
 
 
 const payload = {
@@ -283,8 +281,8 @@ const payload = {
     street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
     zip: postcode,
 
-    phone_code: orderPhoneCode, // "+31"
-    phone: orderPhone,          // local number only
+    phone: ezdashPhone,   // ✅ FULL number, NO +
+    // phone_code: ❌ DO NOT SEND
 
     country_code: country.slice(0, 2).toUpperCase(),
     country,
