@@ -24,7 +24,7 @@ export default function CheckoutPage() {
   const [hiddenHouse, setHiddenHouse] = useState("");
   const [hiddenStreet, setHiddenStreet] = useState("");
   const [hiddenCity, setHiddenCity] = useState("");
-
+ const [hiddenState, setHiddenState] = useState("");
   // Payment
   const [countryCode, setCountryCode] = useState("31");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -32,6 +32,8 @@ export default function CheckoutPage() {
   const [cryptoCoins, setCryptoCoins] = useState([]);
   const [chosenCrypto, setChosenCrypto] = useState("");
   const [showCryptoDropdown, setShowCryptoDropdown] = useState(false);
+ 
+
   
 
   // Price Calc
@@ -114,22 +116,86 @@ const fetchSuggestions = async (value) => {
 };
 
 
-  const handleSuggestionSelect = (selected) => {
-    setShowSuggestions(false);
-    setHouse(selected.label);
+const verifyAddressWithPostgrid = async ({
+  street,
+  houseNumber,
+  postcode,
+  countryISO,
+}) => {
+  try {
+    const body = new URLSearchParams({
+      "address[line1]": `${street} ${houseNumber}`,
+      "address[postalOrZip]": postcode,
+      "address[country]": countryISO,
+    });
 
-    const parts = selected.label.trim().split(" ");
-    const houseNum = parts.find((p) => /^\d/.test(p));
-    const streetName = parts.slice(0, parts.indexOf(houseNum)).join(" ");
-    const postcodeParts = parts.filter(
-      (p) => /^\d{4}$/i.test(p) || /^[A-Z]{2}$/i.test(p)
-    );
-    const cityName = parts[parts.length - 1];
+    const res = await fetch("/api/postgrid/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body,
+    });
 
-    setHiddenHouse(houseNum);
-    setHiddenStreet(streetName);
-    setHiddenCity(cityName);
-  };
+    const result = await res.json();
+
+    const status = result?.data?.summary?.verificationStatus;
+
+    if (status === "verified" || status === "partially_verified") {
+      setHiddenState(result.data.provinceOrState || "");
+      setHiddenCity(result.data.city || hiddenCity);
+
+      console.log("POSTGRID STATE:", result.data.provinceOrState);
+    }
+  } catch (err) {
+    console.error("PostGrid verification failed", err);
+  }
+};
+
+
+ const handleSuggestionSelect = async (selected) => {
+  setShowSuggestions(false);
+  setHouse(selected.label);
+
+  const parts = selected.label.trim().split(" ");
+  const houseNum = parts.find((p) => /^\d/.test(p));
+  const streetName = parts.slice(0, parts.indexOf(houseNum)).join(" ");
+  const cityName = parts[parts.length - 1];
+
+  setHiddenHouse(houseNum);
+  setHiddenStreet(streetName);
+  setHiddenCity(cityName);
+
+  // 🔴 THIS IS THE MISSING STEP
+  try {
+    const body = new URLSearchParams({
+      "address[line1]": `${streetName} ${houseNum}`,
+      "address[postalOrZip]": postcode,
+      "address[country]": countryISO[country] || "NL",
+    });
+
+    const res = await fetch("/api/postgrid/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body,
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+      setHiddenState(result.data.provinceOrState); // ✅ THIS FIXES IT
+      setHiddenCity(result.data.city || cityName);
+    } else {
+      alert("Address verification incomplete. Please reselect your address.");
+    }
+  } catch (err) {
+    console.error("Verification failed", err);
+  }
+};
+
+
 
   const fetchCryptoCoins = async () => {
     try {
@@ -152,6 +218,11 @@ const fetchSuggestions = async (value) => {
     const ezdashPhone = `${countryCode}${phone}`;
 
 console.log("FINAL PHONE FOR EZDASH:", ezdashPhone);
+if (!hiddenState) {
+  alert("Address verification incomplete. Please reselect your address.");
+  setLoading(false);
+  return;
+}
 
 
     if (!name || !email || !phone || !country || !postcode || !house) {
@@ -205,7 +276,8 @@ return {
     email,
     additional: addition,
     city: hiddenCity,
-    state: "",
+    state: hiddenState,
+
     house_no: hiddenHouse,
     street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
     zip: postcode,
@@ -289,7 +361,8 @@ const payload = {
     email,
     additional: addition,
     city: hiddenCity,
-    state: "",
+   state: hiddenState,
+
     house_no: hiddenHouse,
     street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
     zip: postcode,
