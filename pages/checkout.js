@@ -258,32 +258,37 @@ if (paymentMethod === "crypto") {
       quantity: item.paidQty || item.quantity || 1,
     }));
 
-    const payload = {
-      customer: {
-        firstname: name,
-        lastname: label,
-        email,
-        additional: addition,
-        city: hiddenCity,
-        state: "",
-        house_no: hiddenHouse,
-        street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
-        zip: postcode,
-        phone_code: countryCode,
-        phone: phone,
-        country_code: country.slice(0, 2).toUpperCase(),
-        country,
-        guest_ip: "",
-        autoFill: "postgrid",
-      },
-      domain: "apotheek.com",
-      success_url: `${window.location.origin}/checkout/crypto-success`,
-      cancel_url: `${window.location.origin}/checkout`,
-      currency: "EUR",
-      currency_to: chosenCrypto,
-      order_notes: notes,
-      products: fixedCart,
-    };
+// normalize phone
+const cleanPhone = phone.replace(/\D/g, "");
+const cleanCode = countryCode.replace(/\D/g, "");
+const whatsappPhone = `${cleanCode}${cleanPhone}`;
+
+const payload = {
+  customer: {
+    firstname: name,
+    lastname: label,
+    email,
+    additional: addition,
+    city: hiddenCity,
+    state: "",
+    house_no: hiddenHouse,
+    street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
+    zip: postcode,
+    phone_code: cleanCode,        // "31"
+    phone: whatsappPhone,         // "31612345678"
+    country_code: country.slice(0, 2).toUpperCase(),
+    country,
+    guest_ip: "",
+    autoFill: "postgrid",
+  },
+  domain: "apotheek.com",
+  success_url: `${window.location.origin}/checkout/whatsapp-success`,
+  cancel_url: `${window.location.origin}/checkout`,
+  currency: "EUR",
+  order_notes: notes,
+  products: fixedCart,
+};
+
 
   const res = await fetch(
   "https://test2.ezdash.online/api/v1/order/user/create?type=crypto",
