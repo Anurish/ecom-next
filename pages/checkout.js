@@ -26,12 +26,13 @@ export default function CheckoutPage() {
   const [hiddenCity, setHiddenCity] = useState("");
 
   // Payment
-  const [countryCode, setCountryCode] = useState("+31");
+  const [countryCode, setCountryCode] = useState("31");
   const [paymentMethod, setPaymentMethod] = useState("");
 
   const [cryptoCoins, setCryptoCoins] = useState([]);
   const [chosenCrypto, setChosenCrypto] = useState("");
   const [showCryptoDropdown, setShowCryptoDropdown] = useState(false);
+  
 
   // Price Calc
   const subtotal = cart.reduce((sum, item) => {
@@ -42,15 +43,15 @@ export default function CheckoutPage() {
 
   const total = subtotal + shippingCost;
 
-  const countryPhoneCodes = {
-    Netherlands: "+31",
-    Germany: "+49",
-    Belgium: "+32",
-    France: "+33",
-    "United Kingdom": "+44",
-    "United States": "+1",
-    India: "+91",
-  };
+const countryPhoneCodes = {
+  Netherlands: "31",
+  Germany: "49",
+  Belgium: "32",
+  France: "33",
+  "United Kingdom": "44",
+  India: "91",
+};
+
 
   const countryISO = {
     Netherlands: "NL",
@@ -147,6 +148,12 @@ const fetchSuggestions = async (value) => {
 
   // Checkout flow
   const startCheckout = async () => {
+
+    const ezdashPhone = `${countryCode}${phone}`;
+
+console.log("FINAL PHONE FOR EZDASH:", ezdashPhone);
+
+
     if (!name || !email || !phone || !country || !postcode || !house) {
       alert("Please fill all required fields");
       return;
@@ -191,31 +198,32 @@ return {
 
 
 
-    const payload = {
-      customer: {
-        firstname: name,
-        lastname: label,
-        email,
-        additional: addition,
-        city: hiddenCity,
-        state: "",
-        house_no: hiddenHouse,
-        street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
-        zip: postcode,
-        phone_code: countryCode,
-        phone: phone,
-        country_code: country.slice(0, 2).toUpperCase(),
-        country,
-        guest_ip: "",
-        autoFill: "postgrid",
-      },
-      domain: "apotheek.com",
-      success_url: `${window.location.origin}/checkout/whatsapp-success`,
-      cancel_url: `${window.location.origin}/checkout`,
-      currency: "EUR",
-      order_notes: notes,
-      products: fixedCart,
-    };
+  const payload = {
+  customer: {
+    firstname: name,
+    lastname: label,
+    email,
+    additional: addition,
+    city: hiddenCity,
+    state: "",
+    house_no: hiddenHouse,
+    street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
+    zip: postcode,
+
+    phone: ezdashPhone, // ✅ THIS IS THE KEY FIX
+
+    country_code: countryISO[country] || "NL",
+    country,
+    guest_ip: "",
+    autoFill: "postgrid",
+  },
+  domain: "apotheek.com",
+  success_url: `${window.location.origin}/checkout/whatsapp-success`,
+  cancel_url: `${window.location.origin}/checkout`,
+  currency: "EUR",
+  order_notes: notes,
+  products: fixedCart,
+};
 
     localStorage.setItem("whatsapp_products", JSON.stringify(fixedCart));
 
@@ -259,15 +267,20 @@ if (paymentMethod === "crypto") {
     }));
 
 // normalize phone
-const cleanPhone = phone.replace(/\D/g, "");        // "6656545545"
-const cleanCode = countryCode.replace(/\D/g, "");  // "31"
+const cleanPhone = phone.replace(/\D/g, "");
+const cleanCode = countryCode.replace(/\D/g, "");
+const ezdashPhone = `${cleanCode}${cleanPhone}`;
 
-// THIS is what ezdash expects
-const ezdashPhone = `${cleanCode}${cleanPhone}`;   // "316656545545"
+console.log("SENDING TO EZDASH:", ezdashPhone);
 
-console.log("EZDASH PHONE:", ezdashPhone);
-
-
+const countryISOMap = {
+  Netherlands: "NL",
+  Germany: "DE",
+  Belgium: "BE",
+  France: "FR",
+  "United Kingdom": "GB",
+  India: "IN",
+};
 
 const payload = {
   customer: {
@@ -281,10 +294,9 @@ const payload = {
     street_name: `${hiddenStreet} ${hiddenHouse} ${postcode} ${hiddenCity}`,
     zip: postcode,
 
-    phone: ezdashPhone,   // ✅ FULL number, NO +
-    // phone_code: ❌ DO NOT SEND
+    phone: ezdashPhone, // ✅ FULL NUMBER (digits only)
 
-    country_code: country.slice(0, 2).toUpperCase(),
+    country_code: countryISOMap[country] || "NL",
     country,
     guest_ip: "",
     autoFill: "postgrid",
@@ -433,22 +445,30 @@ if (data?.success) {
                 {/* PHONE + EMAIL */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
                   <div className="flex">
-                    <select
-                      className="border rounded-l-lg px-3 bg-gray-100"
-                      value={countryCode}
-                      onChange={(e) => setCountryCode(e.target.value)}
-                    >
-                      {Object.values(countryPhoneCodes).map((code) => (
-                        <option key={code}>{code}</option>
-                      ))}
-                    </select>
+                 <select
+  className="border rounded-l-lg px-3 bg-gray-100"
+  value={countryCode}
+  onChange={(e) => setCountryCode(e.target.value)}
+>
+  {Object.entries(countryPhoneCodes).map(([country, code]) => (
+    <option key={country} value={code}>
+      +{code}
+    </option>
+  ))}
+</select>
 
-                    <input
-                      placeholder="Phone Number"
-                      className="w-full border rounded-r-lg p-3"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
+
+                 <input
+  placeholder="Phone Number"
+  className="w-full border rounded-r-lg p-3"
+  value={phone}
+  onChange={(e) => {
+    // allow only digits
+    const digits = e.target.value.replace(/\D/g, "");
+    setPhone(digits);
+  }}
+/>
+
                   </div>
 
                   <input

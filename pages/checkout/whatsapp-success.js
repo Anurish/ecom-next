@@ -161,10 +161,11 @@ const whatsappTotal = whatsappSubtotal + shipping;
           )}
           <p><strong>Land: </strong>{customer.country}</p>
           <p><strong>PLZ: </strong>{customer.zip}</p>
-         <p className="mt-3">
+     <p className="mt-3">
   <strong>Kontaktnummer: </strong>
-  {customer.phone_code}{customer.phone}
+  +{customer.phone}
 </p>
+
 
         </div>
       </div>
