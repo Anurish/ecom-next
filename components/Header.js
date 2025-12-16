@@ -47,7 +47,7 @@ const cartCount = cart.reduce(
           <Link href="/category/Antibiotics">Antibiotics</Link>
           <Link href="/category/Stimulants">Stimulants</Link>
           <Link href="/category/Erection-Pills">Erection Pills</Link>
-          <Link href="/blogs">Blogs</Link>
+         
           <Link href="/offers"><p className="hover:text-green-700">Angebote</p></Link>
           <Link href="/about-us">About</Link>
         </nav>
