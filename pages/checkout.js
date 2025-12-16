@@ -68,23 +68,29 @@ const countryPhoneCodes = {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  useEffect(() => {
-    if (!country) return;
+useEffect(() => {
+  if (!country) return;
 
-    const fetchShipping = async () => {
-      try {
-        const url = `https://prod2api.ezdash.online/api/v1/payment/stripe-publish-key?country=${country}&type=crypto`;
-        const res = await fetch(url);
-        const data = await res.json();
-        const cost = data?.data?.shipping_cost?.cost || 0;
-        setShippingCost(cost);
-      } catch {
-        setShippingCost(0);
-      }
-    };
+  const fetchShipping = async () => {
+    try {
+      const res = await fetch(
+        `/api/ezdash/shipping?country=${country}&type=crypto`
+      );
 
-    fetchShipping();
-  }, [country]);
+      if (!res.ok) throw new Error("Shipping fetch failed");
+
+      const data = await res.json();
+      const cost = data?.data?.shipping_cost?.cost || 0;
+      setShippingCost(cost);
+    } catch (err) {
+      console.error("Shipping error:", err);
+      setShippingCost(0);
+    }
+  };
+
+  fetchShipping();
+}, [country]);
+
 
   // FIXED — fetch suggestions only when postcode exists & house entered
 const fetchSuggestions = async (value) => {
